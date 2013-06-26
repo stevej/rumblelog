@@ -1,7 +1,7 @@
 rumblelog:
   development:
-    email: stevej@fruitless.org
-    password: jP3X_YBwBA1iYQ
+    email: nil
+    password: nil
   test:
-    email: stevej@fruitless.org
-    password: jP3X_YBwBA1iYQ
+    email: nil
+    password: nil
