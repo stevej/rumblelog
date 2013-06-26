@@ -1,0 +1,21 @@
+<h1>{{title}}</h1>
+
+<p>{{content}}</p>
+
+<ul>
+  <li>
+    <a href="/">Home</a>
+  </li>
+</ul>
+
+{{#tags}}
+  {{> tag_content }}
+{{/tags}}
+
+{{^tags}}
+  <p>
+    Sorry, there are no pages for those tags. Try creating some!
+  </p>
+{{/tags}}
+
+{{> footer}}

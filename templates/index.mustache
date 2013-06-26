@@ -1,0 +1,21 @@
+<h1>{{title}}</h1>
+
+<p>{{content}}</p>
+
+<ul>
+  <li>
+    <a href="/">Home</a>
+  </li>
+</ul>
+
+{{#pages}}
+  {{> page_content }}
+{{/pages}}
+
+{{^pages}}
+  <p>
+    Sorry, there are no pages to display. Try creating some!
+  </p>
+{{/pages}}
+
+{{> footer}}

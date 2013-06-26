@@ -1,0 +1,8 @@
+rumblelog
+fauna
+.bundle
+.config
+*.gem
+tmp
+vendor
+Gemfile.lock

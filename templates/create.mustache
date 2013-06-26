@@ -1,0 +1,12 @@
+<h1>{{title}}</h1>
+
+<form name="create" action="/create" method="POST">
+  <br />
+  title: <input name="page[title]" /><br/>
+  url: <input name="page[url]" value="{{fresh_page_url}}"/><br/>
+  tags: <input name="page[tags]" /><br/>
+  body: <textarea name="page[body]" /></textarea><br/>
+  <button type="submit"/>publish</button><br>
+</form>
+
+{{> footer}}
