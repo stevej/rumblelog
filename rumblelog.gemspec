@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'rumblelog'
-  s.version     = '0.1.1'
+  s.version     = '0.1.2'
   s.date        = '2013-06-25'
   s.summary     = "A site publishing system!"
   s.description = "A dynamic site publishing system with Pages and Tags powered by fauna"
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
     'http://github.com/stevej/rumblelog'
 
   s.files         = `git ls-files`.split($/)
-  s.require_paths = ["lib"]
+  s.require_paths = [".", "lib"]
 
   s.add_development_dependency "bundler"
   s.add_dependency "sinatra"
