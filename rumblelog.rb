@@ -10,11 +10,11 @@ module Fauna
   mattr_accessor :credentials
   mattr_accessor :connection
 
-  self.credentials = Fauna::Rack::credentials("#{ENV["HOME"]}/.fauna.yml",
-                                              "config/fauna.yml",
+  self.credentials = Fauna::Rack::credentials("config/fauna.yml",
+                                              "#{ENV["HOME"]}/.fauna.yml",
                                               "rumblelog")
 
-  self.connection = Fauna::Rack::connection(self.credentials, Logger.new("rumblelog"))[:connection]
+  self.connection = Fauna::Rack::connection(self.credentials, Logger.new("rumblelog.log"))[:connection]
 end
 
 class Rumblelog < Sinatra::Base
@@ -67,7 +67,6 @@ class Rumblelog < Sinatra::Base
   get '/' do
     # TODO: Load N Pages, unfortunately .first only grants me a `resource` accessor.
     @pages = with_context { Page.all.page(:size => 3).first.resource.to_html_hash }
-    pp @pages
     mustache :index
   end
 
@@ -125,7 +124,6 @@ class Page < Fauna::Class
 
   def links_for_tags
     tags = self.data['tags']
-    pp tags
     if tags.nil?
       []
     else
