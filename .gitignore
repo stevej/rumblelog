@@ -1,4 +1,4 @@
-rumblelog
+*.log
 fauna
 .bundle
 .config
