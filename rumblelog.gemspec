@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.version     = '0.1.1'
   s.date        = '2013-06-25'
   s.summary     = "A site publishing system!"
-  s.description = "A dynamic site publishing with Pages and Tags powered by fauna"
+  s.description = "A dynamic site publishing system with Pages and Tags powered by fauna"
   s.license     = "Apache 2.0"
   s.authors     = ["Steve Jenson"]
   s.email       = 'stevej@fruitless.org'
