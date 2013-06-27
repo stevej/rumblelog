@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'rumblelog'
-  s.version     = '0.1.3'
+  s.version     = '0.1.4'
   s.date        = '2013-06-25'
   s.summary     = "A site publishing system!"
   s.description = "A dynamic site publishing system with Pages and Tags powered by fauna"
@@ -17,4 +17,5 @@ Gem::Specification.new do |s|
   s.add_dependency "sinatra"
   s.add_dependency "fauna"
   s.add_dependency "mustache"
+  s.add_dependency "active_support"
 end
