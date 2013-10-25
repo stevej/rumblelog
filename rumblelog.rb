@@ -1,6 +1,9 @@
 require 'sinatra/base'
 require 'mustache/sinatra'
 require 'fauna'
+# for mattr_accessor
+require 'active_support/core_ext/module/attribute_accessors'
+require 'pp'
 
 # TODO: make this nicer
 load 'lib/fauna_helper.rb'
@@ -10,11 +13,13 @@ module Fauna
   mattr_accessor :credentials
   mattr_accessor :connection
 
+  # TODO make the location of local .fauna.yml configurable
   self.credentials = Fauna::Rack::credentials("config/fauna.yml",
                                               "#{ENV["HOME"]}/.fauna.yml",
                                               "rumblelog")
 
-  self.connection = Fauna::Rack::connection(self.credentials, Logger.new("rumblelog.log"))[:connection]
+  self.connection = Fauna::Rack::connection(self.credentials,
+                                            Logger.new("rumblelog.log"))
 end
 
 class Rumblelog < Sinatra::Base
@@ -33,6 +38,7 @@ class Rumblelog < Sinatra::Base
       halt 401, "Not authorized\n"
     end
 
+    # FIXME: move the password into a config file.
     def authorized?
       @auth ||=  Rack::Auth::Basic::Request.new(request.env)
 
@@ -43,30 +49,21 @@ class Rumblelog < Sinatra::Base
     end
   end
 
-
-  def with_context(&block)
-    if block.nil?
-      raise "with_context called without block"
-    elsif Fauna.connection.nil?
-      raise "cannot use Fauna::Client.context without connection"
-    else
-      Fauna::Client.context(Fauna.connection) do
-        block.call
-      end
+  before do
+    Fauna.with_context do
+      @pages_set = Fauna::Set.new('classes/Pages/instances')
+      @pages = @pages_set.page(:size => 150).map { |p| puts p; Page.find(p) }
+      pp @pages
+      pp @pages.size
     end
   end
-
-  if defined?(Fauna.connection)
-    puts "phew, we have a connection"
-  else
-    puts "no fauna connection"
-  end
-
   set :public_folder, 'public'
 
   get '/' do
     # TODO: Load N Pages, unfortunately .first only grants me a `resource` accessor.
-    @pages = with_context { Page.all.page(:size => 3).first.resource.to_html_hash }
+    # @pages = with_context { Page.all.page(:size => 3).first.resource.to_html_hash }
+    puts "going to render /"
+    pp @pages
     mustache :index
   end
 
@@ -81,7 +78,11 @@ class Rumblelog < Sinatra::Base
     data = params[:page]
     # TODO: ensure that unique_id is truly unique before creating entry.
     data[:unique_id] = data[:url]
-    with_context { Page.create!(data) }
+    Fauna.with_context do
+      # this needs to be splatted, I expect.
+      pp data
+      page = Fauna::Resource.create('classes/Pages', :data => data)
+    end
     redirect "/"
   end
 
@@ -94,7 +95,7 @@ class Rumblelog < Sinatra::Base
   end
 
   get '/t/:tag' do |tag|
-    @pages = with_context { Tag.find_by_unique_id(tag).pages }
+    @pages = Fauna.with_context { Tag.find_by_unique_id(tag).pages }
     mustache :index
   end
 
@@ -105,25 +106,49 @@ class Rumblelog < Sinatra::Base
 
   get '/:url' do |url|
     # matches "GET /hello/foo" and "GET /hello/bar"
-    # params[:name] is 'foo' or 'bar'
-    # n stores params[:name]
-    @pages = with_context { Page.find_by_unique_id(url) }
-    mustache :render_page # TODO: bad name
+    begin
+      @pages = Fauna.with_context { Page.find(url) }
+      mustache :render_page
+    rescue Fauna::Connection::NotFound
+      status 404
+      body '404 - page not found'
+    end
   end
-
 end
 
-class Page < Fauna::Class
-  field :title, :body, :url, :tags
-  reference :tag
-  after_save :update_tags
+class Page
+  attr_accessor :resource
 
-  def initialize(attrs = {})
-    super(attrs)
+  def self.find(ref)
+    Page.new(Fauna::Resource.find(ref))
+  end
+
+  def title
+    self.resource.data['title']
+  end
+
+  def url
+    self.resource.data['url']
+  end
+
+  def body
+    self.resource.data['body']
+  end
+
+  def tags
+    self.resource.data['tags']
+  end
+
+  def ts
+    self.resource.ts
+  end
+
+  def initialize(resource)
+    self.resource = resource
   end
 
   def links_for_tags
-    tags = self.data['tags']
+    tags = self.tags
     if tags.nil?
       []
     else
@@ -134,13 +159,13 @@ class Page < Fauna::Class
   end
 
   def to_html_hash
-    html_hash = data
+    html_hash = self.resource.data
     html_hash[:links_for_tags] = self.links_for_tags
     html_hash
   end
 
   def update_tags
-    tags = self.data['tags']
+    tags = self.tags
     unless tags.nil?
       tags.split(",").each do |tag_name|
         tag_name.strip!
@@ -156,8 +181,8 @@ class Page < Fauna::Class
   end
 end
 
-class Tag < Fauna::Class
-  reference :page
+class Tag < Fauna::Resource
+  #reference :page
 end
 
 # Data Model
@@ -167,13 +192,13 @@ end
 # Tags are organized by time
 #
 #
-Fauna.schema do
-  with Tag do
-    event_set :pages
-  end
+# Fauna.schema do
+#   with Tag do
+#     event_set :pages
+#   end
 
-  with Page do
-    event_set :tags
-  end
-end
+#   with Page do
+#     event_set :tags
+#   end
+# end
 

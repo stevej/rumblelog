@@ -6,7 +6,7 @@ class Rumblelog
       end
 
       def content
-        "Not a blog. c'mon guys."
+        "An example blog powered by the fauna cloud database."
       end
     end
   end

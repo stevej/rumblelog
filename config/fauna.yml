@@ -2,6 +2,8 @@ rumblelog:
   development:
     email: nil
     password: nil
+    server_key: nil
   test:
     email: nil
     password: nil
+    server_key: nil

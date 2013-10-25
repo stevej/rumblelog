@@ -1,17 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
       {{title}}
     </title>
-    <style>
-      body { bbackground: #eee; }
-      li { list-style: none !important; }
-    </style>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="/css/blog.css">
+    <script src="http://use.typekit.net/gis6vng.js"></script>
   </head>
   <body>
-    <div id="main">
-      {{{yield}}}
+    <div class="pure-g-r" id="layout">
+      {{> sidebar}}
+      <div class="pure-u-1">
+        {{{yield}}}
+      </div>
     </div>
   </body>
 </html>

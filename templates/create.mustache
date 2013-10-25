@@ -1,12 +1,25 @@
-<h1>{{title}}</h1>
+<h1>Create a new Post</h1>
 
-<form name="create" action="/create" method="POST">
-  <br />
-  title: <input name="page[title]" /><br/>
-  url: <input name="page[url]" value="{{fresh_page_url}}"/><br/>
-  tags: <input name="page[tags]" /><br/>
-  body: <textarea name="page[body]" /></textarea><br/>
-  <button type="submit"/>publish</button><br>
+<form class="pure-form pure-form-aligned" name="create" action="/create" method="POST">
+<fieldset>
+  <div class="pure-control-group">
+    <label for="title">Title</label>
+    <input id="title" name="page[title]" />
+  </div>
+  <div class="pure-control-group">
+    <label for="url">URL</label>
+    <input id="url" name="page[url]" value="{{fresh_page_url}}"/>
+  </div>
+  <div class="pure-control-group">
+    <label for="tags">Tags</label>
+    <input id="tags" name="page[tags]" />
+  </div>
+  <div class="pure-control-group">
+    <label for="body">Body</label>
+    <textarea id="body" placeholder="Your Post Here" name="page[body]" /></textarea>
+  </div>
+  <div class="pure-controls">
+    <button class="pure-button pure-button-primary" type="submit"/>publish</button>
+  </div>
+  </fieldset>
 </form>
-
-{{> footer}}

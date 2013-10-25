@@ -1,16 +1,12 @@
-<h1>{{title}}</h1>
+<!-- index -->
 
-<p>{{content}}</p>
-
-<ul>
-  <li>
-    <a href="/">Home</a>
-  </li>
-</ul>
-
-{{#pages}}
-  {{> page_content }}
-{{/pages}}
+  <div class="content">
+    <div class="posts">
+      {{#pages}}
+        {{> page_content }}
+      {{/pages}}
+    </div>
+  </div>
 
 {{^pages}}
   <p>
@@ -19,3 +15,4 @@
 {{/pages}}
 
 {{> footer}}
+<!-- /index -->
