@@ -50,6 +50,7 @@ class Rumblelog < Sinatra::Base
     Fauna.with_context do
       @pages_set = Fauna::Set.new('classes/Pages/instances')
       @pages = @pages_set.page(:size => 10).map { |p| Page.find(p) }
+      pp @pages
     end
 
     mustache :index
@@ -92,10 +93,10 @@ class Rumblelog < Sinatra::Base
     mustache :status
   end
 
-  get '/:url' do |url|
+  get '/classes/Pages/:instance_ref' do |instance_ref|
     # matches "GET /hello/foo" and "GET /hello/bar"
     begin
-      @pages = Fauna.with_context { Page.find(url) }
+      @pages = Fauna.with_context { Page.find("/classes/Pages/#{instance_ref}") }
       mustache :render_page
     rescue Fauna::Connection::NotFound
       status 404
@@ -129,6 +130,10 @@ class Page
 
   def ts
     self.resource.ts
+  end
+
+  def ref
+    self.resource.ref
   end
 
   def initialize(resource)
