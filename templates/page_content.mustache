@@ -3,10 +3,12 @@
   <header class="post-header">
    <h2 class="post-title">{{title}}</h2>
 
-    <p class="post-meta">
+   <p class="post-meta">
+       Tags:
       {{#links_for_tags}}
-        Tags: <a class="post-category post-category-design" href="/t/{{tag_name}}">{{tag_name}}</a>
+        <a class="post-category post-category-design" href="/t/{{tag_name}}">{{tag_name}}</a>
       {{/links_for_tags}}
+      {{^links_for_tags}}<small>none</small>{{/links_for_tags}}
       Written at: <small><a href="{{url}}">{{ts}}</a></small>
     </p>
   </header>
