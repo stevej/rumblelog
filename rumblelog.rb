@@ -44,21 +44,14 @@ class Rumblelog < Sinatra::Base
     end
   end
 
-  before do
-    Fauna.with_context do
-      @pages_set = Fauna::Set.new('classes/Pages/instances')
-      @pages = @pages_set.page(:size => 150).map { |p| puts p; Page.find(p) }
-      pp @pages
-      pp @pages.size
-    end
-  end
   set :public_folder, 'public'
 
   get '/' do
-    # TODO: Load N Pages, unfortunately .first only grants me a `resource` accessor.
-    # @pages = with_context { Page.all.page(:size => 3).first.resource.to_html_hash }
-    puts "going to render /"
-    pp @pages
+    Fauna.with_context do
+      @pages_set = Fauna::Set.new('classes/Pages/instances')
+      @pages = @pages_set.page(:size => 10).map { |p| Page.find(p) }
+    end
+
     mustache :index
   end
 
