@@ -10,16 +10,10 @@ load 'lib/fauna_helper.rb'
 
 # TODO: this is not awesome but works for now.
 module Fauna
-  mattr_accessor :credentials
   mattr_accessor :connection
 
-  # TODO make the location of local .fauna.yml configurable
-  self.credentials = Fauna::Rack::credentials("config/fauna.yml",
-                                              "#{ENV["HOME"]}/.fauna.yml",
-                                              "rumblelog")
-
-  self.connection = Fauna::Rack::connection(self.credentials,
-                                            Logger.new("rumblelog.log"))
+  self.connection = Fauna::Connection.new(secret: ENV['RUMBLELOG_FAUNA_SECRET'],
+                                          logger: Logger.new("fauna.log"))
 end
 
 class Rumblelog < Sinatra::Base
@@ -34,7 +28,7 @@ class Rumblelog < Sinatra::Base
   helpers do
     def protected!
       return if authorized?
-      headers['WWW-Authenticate'] = 'Basic realm="Restricted Area"'
+      headers['WWW-Authenticate'] = 'Basic realm="Rumblelog Admin"'
       halt 401, "Not authorized\n"
     end
 
@@ -45,7 +39,8 @@ class Rumblelog < Sinatra::Base
       @auth.provided? &&
         @auth.basic? &&
         @auth.credentials &&
-        @auth.credentials == ['admin', 'admin']
+        @auth.credentials == [ENV['RUMBLELOG_ADMIN_USERNAME'],
+                              ENV['RUMBLELOG_ADMIN_PASSWORD']]
     end
   end
 
