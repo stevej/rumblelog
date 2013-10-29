@@ -65,11 +65,8 @@ class Rumblelog < Sinatra::Base
     protected!
     # TODO: validate post params
     data = params[:page]
-    # TODO: make it easy to pull data and constraints map apart
-    data[:unique_id] = data[:url]
     constraints = {}
-    constraints[:permalink] = data[:permalink]
-    data.delete(:permalink)
+    constraints["permalink"] = data.delete("permalink")
     Fauna.with_context do
       page = Fauna::Resource.create('classes/Pages',
                                     :data        => data,
@@ -100,14 +97,7 @@ class Rumblelog < Sinatra::Base
     # matches "GET /hello/foo" and "GET /hello/bar"
     begin
       @pages = Fauna.with_context do
-        foo = Page.find_by_permalink(permalink)
-        puts "foo: #{foo}"
-        foo_page = foo.page(:size => 1)
-        puts "foo_page: #{foo_page}"
-        puts "foo_page.empty?: #{foo_page.empty?}"
-        foos = foo_page.map { |p| Page.find(p) }
-        puts "foos: #{foos}"
-        foos
+        Page.find_by_permalink(permalink).page(:size => 1).map { |p| Page.find(p) }
       end
 
       puts "@pages.empty? #{@pages.empty?}"
@@ -134,8 +124,8 @@ class Page
     self.resource.data['title']
   end
 
-  def url
-    self.resource.data['url']
+  def permalink
+    self.resource.constraints['permalink']
   end
 
   def body
