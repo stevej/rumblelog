@@ -1,5 +1,4 @@
 * Edit a Post
-* User-creatable permalinks
 * Tags
 * Delete a Post
 * Atom

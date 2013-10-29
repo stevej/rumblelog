@@ -65,12 +65,15 @@ class Rumblelog < Sinatra::Base
     protected!
     # TODO: validate post params
     data = params[:page]
-    # TODO: ensure that unique_id is truly unique before creating entry.
+    # TODO: make it easy to pull data and constraints map apart
     data[:unique_id] = data[:url]
+    constraints = {}
+    constraints[:permalink] = data[:permalink]
+    data.delete(:permalink)
     Fauna.with_context do
-      # this needs to be splatted, I expect.
-      pp data
-      page = Fauna::Resource.create('classes/Pages', :data => data)
+      page = Fauna::Resource.create('classes/Pages',
+                                    :data        => data,
+                                    :constraints => constraints)
     end
     redirect "/"
   end
@@ -93,10 +96,21 @@ class Rumblelog < Sinatra::Base
     mustache :status
   end
 
-  get '/classes/Pages/:instance_ref' do |instance_ref|
+  get '/:permalink' do |permalink|
     # matches "GET /hello/foo" and "GET /hello/bar"
     begin
-      @pages = Fauna.with_context { Page.find("/classes/Pages/#{instance_ref}") }
+      @pages = Fauna.with_context do
+        foo = Page.find_by_permalink(permalink)
+        puts "foo: #{foo}"
+        foo_page = foo.page(:size => 1)
+        puts "foo_page: #{foo_page}"
+        puts "foo_page.empty?: #{foo_page.empty?}"
+        foos = foo_page.map { |p| Page.find(p) }
+        puts "foos: #{foos}"
+        foos
+      end
+
+      puts "@pages.empty? #{@pages.empty?}"
       mustache :render_page
     rescue Fauna::Connection::NotFound
       status 404
@@ -110,6 +124,10 @@ class Page
 
   def self.find(ref)
     Page.new(Fauna::Resource.find(ref))
+  end
+
+  def self.find_by_permalink(permalink)
+    Fauna::Set.match('classes/Pages', 'constraints.permalink', permalink)
   end
 
   def title
