@@ -1,5 +1,4 @@
 * Edit a Post
 * Tags
 * Delete a Post
-* Atom
 * Run on Heroku

@@ -1,8 +1,8 @@
 <!-- sidebar -->
 <div class="sidebar pure-u">
   <hgroup>
-    <h1 class="brand-title"><a href="/">Rumblelog</a></h1>
-    <h2 class="brand-tagline">A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://sinatrarb.com">Sinatra</a>, <a href="http://purecss.io">Pure</a>, and <a href="http://heroku.com">Heroku</a></h2>
+    <h1 class="brand-title"><a href="/">{{title}}</a></h1>
+    <h2 class="brand-tagline">{{{subtitle}}}</h2>
   </hgroup>
   <nav class="nav">
     <ul class="nav-list">
@@ -18,6 +18,11 @@
       <li class="nav-item">
         <a class="pure-button" href="/status">Status</a>
       </li></div>
+      <div>
+        <li class="nav-item">
+          <a class="pure-button" href="/atom.xml">Atom feed</a>
+        </li>
+      </div>
     </ul>
   </nav>
 </div>

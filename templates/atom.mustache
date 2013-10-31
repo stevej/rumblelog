@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+        <title>{{title}}</title>
+        <subtitle><![CDATA[{{{subtitle}}}]]></subtitle>
+        <link href="{{full_url}}/atom.xml" rel="self" />
+        <link href="{{full_url}}" />
+        <id>{{full_url}}</id>
+        <updated>{{last_updated}}</updated>
+        {{#pages}}
+        <entry>
+          <title><![CDATA[{{{title}}}]]></title>
+          <link href="{{full_url}}/{{permalink}}" />
+          <id>{{full_url}}/{{permalink}}</id>
+          <updated>{{ts_for_atom}}</updated>
+          <summary><![CDATA[{{body}}]]></summary>
+        </entry>
+        {{/pages}}
+</feed>

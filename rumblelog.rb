@@ -3,7 +3,6 @@ require 'mustache/sinatra'
 require 'fauna'
 # for mattr_accessor
 require 'active_support/core_ext/module/attribute_accessors'
-require 'pp'
 
 # TODO: make this nicer
 load 'lib/fauna_helper.rb'
@@ -24,6 +23,14 @@ class Rumblelog < Sinatra::Base
     :views     => 'views/',
     :templates => 'templates/'
   }
+
+  configure do
+    set :title, "Rumbleblog"
+    set :subtitle, <<-eos
+A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://sinatrarb.com">Sinatra</a>, <a href="http://purecss.io">Pure</a>, and <a href="http://heroku.com">Heroku</a>
+    eos
+    set :full_url_prefix, "http://rumblelog.herokuapp.com"
+  end
 
   helpers do
     def protected!
@@ -46,13 +53,20 @@ class Rumblelog < Sinatra::Base
 
   set :public_folder, 'public'
 
-  get '/' do
+
+  def build_frontpage
+    # FIXME: this is terrible, sinatra.
+    @title = settings.title
+    @subtitle = settings.subtitle
+    @full_url_prefix = settings.full_url_prefix
     Fauna.with_context do
       @pages_set = Fauna::Set.new('classes/Pages/instances')
       @pages = @pages_set.page(:size => 10).map { |p| Page.find(p) }
-      pp @pages
     end
+  end
 
+  get '/' do
+    build_frontpage
     mustache :index
   end
 
@@ -93,6 +107,11 @@ class Rumblelog < Sinatra::Base
     mustache :status
   end
 
+  get '/atom.xml' do
+    build_frontpage
+    mustache :atom, {:layout => false}
+  end
+
   get '/:permalink' do |permalink|
     # matches "GET /hello/foo" and "GET /hello/bar"
     begin
@@ -100,7 +119,6 @@ class Rumblelog < Sinatra::Base
         Page.find_by_permalink(permalink).page(:size => 1).map { |p| Page.find(p) }
       end
 
-      puts "@pages.empty? #{@pages.empty?}"
       mustache :render_page
     rescue Fauna::Connection::NotFound
       status 404
@@ -138,6 +156,10 @@ class Page
 
   def ts
     self.resource.ts
+  end
+
+  def ts_for_atom
+    ts.to_datetime.to_s
   end
 
   def ref

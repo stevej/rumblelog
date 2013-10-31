@@ -5,8 +5,12 @@ class Rumblelog
         @pages
       end
 
-      def content
-        "An example blog powered by the fauna cloud database."
+      def title
+        @title
+      end
+
+      def subtitle
+        @subtitle
       end
     end
   end
