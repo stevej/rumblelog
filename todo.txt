@@ -1,4 +1,5 @@
 * Edit a Post
 * Tags
 * Delete a Post
+* Move to published gem version
 * Run on Heroku
