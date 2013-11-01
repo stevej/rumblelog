@@ -79,6 +79,8 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
     protected!
     # TODO: validate post params
     data = params[:page]
+    data["tags"] = data["rawtags"].split(",").map { |t| t.strip }
+    data.delete("rawtags")
     constraints = {}
     constraints["permalink"] = data.delete("permalink")
     Fauna.with_context do
@@ -98,7 +100,9 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
   end
 
   get '/t/:tag' do |tag|
-    @pages = Fauna.with_context { Tag.find_by_unique_id(tag).pages }
+    @pages = Fauna.with_context do
+      Page.find_by_tag(tag).page(:size => 10).map { |p| Page.find(p) }
+    end
     mustache :index
   end
 
@@ -138,6 +142,10 @@ class Page
     Fauna::Set.match('classes/Pages', 'constraints.permalink', permalink)
   end
 
+  def self.find_by_tag(tag)
+    Fauna::Set.match('classes/Pages', 'data.tags', tag)
+  end
+
   def title
     self.resource.data['title']
   end
@@ -175,7 +183,7 @@ class Page
     if tags.nil?
       []
     else
-      tags.split(",").map do |tag_name|
+      tags.map do |tag_name|
         {tag_name: tag_name.strip}
       end
     end
