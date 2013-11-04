@@ -1,12 +1,11 @@
 source "http://rubygems.org"
 
 gem 'sinatra'
-gem 'tux'
-
-gem 'fauna', :path => "/fauna-ruby"
+gem 'fauna'
 gem 'mustache'
 gem 'shotgun'
 gem 'rake'
+gem 'tux'
 gem 'unicorn'
 gem 'active_support'
 

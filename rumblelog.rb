@@ -11,8 +11,8 @@ load 'lib/fauna_helper.rb'
 module Fauna
   mattr_accessor :connection
 
-  self.connection = Fauna::Connection.new(secret: ENV['RUMBLELOG_FAUNA_SECRET'],
-                                          logger: Logger.new("fauna.log"))
+  self.connection = Fauna::Connection.new(:secret => ENV['RUMBLELOG_FAUNA_SECRET'],
+                                          :port => 443)
 end
 
 class Rumblelog < Sinatra::Base
@@ -75,14 +75,21 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
     mustache :create
   end
 
-  post '/create' do
-    protected!
-    # TODO: validate post params
+  def validate(params)
     data = params[:page]
     data["tags"] = data["rawtags"].split(",").map { |t| t.strip }
     data.delete("rawtags")
+
     constraints = {}
     constraints["permalink"] = data.delete("permalink")
+
+    return data, constraints
+  end
+
+  post '/create' do
+    protected!
+    # TODO: validate post params
+    data, constraints = validate(params)
     Fauna.with_context do
       page = Fauna::Resource.create('classes/Pages',
                                     :data        => data,
@@ -93,6 +100,11 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
 
   get '/edit' do
     protected!
+    data, constraints = validate(params)
+    Fauna.with_context do
+      # Fauna::Resource.update ???
+    end
+    redirect "/edit"
   end
 
   post '/edit' do
