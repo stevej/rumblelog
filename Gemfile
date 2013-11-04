@@ -1,7 +1,7 @@
 source "http://rubygems.org"
 
 gem 'sinatra'
-gem 'fauna'
+gem 'fauna', ">= 1.2"
 gem 'mustache'
 gem 'shotgun'
 gem 'rake'

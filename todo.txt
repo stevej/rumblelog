@@ -1,6 +1,5 @@
 * Edit a Post
 ** Delete a tag
 * Delete a Post
-* Move to published gem version
 * Run on Heroku
 * Write HOWTO for running your own version
