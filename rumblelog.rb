@@ -11,8 +11,7 @@ load 'lib/fauna_helper.rb'
 module Fauna
   mattr_accessor :connection
 
-  self.connection = Fauna::Connection.new(:secret => ENV['RUMBLELOG_FAUNA_SECRET'],
-                                          :port => 443)
+  self.connection = Fauna::Connection.new(:secret => ENV['RUMBLELOG_FAUNA_SECRET'])
 end
 
 class Rumblelog < Sinatra::Base
@@ -53,12 +52,14 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
 
   set :public_folder, 'public'
 
-
-  def build_frontpage
+  before do
     # FIXME: this is terrible, sinatra.
     @title = settings.title
     @subtitle = settings.subtitle
     @full_url_prefix = settings.full_url_prefix
+  end
+
+  def build_frontpage
     Fauna.with_context do
       @pages_set = Fauna::Set.new('classes/Pages/instances')
       @pages = @pages_set.page(:size => 10).map { |p| Page.find(p) }
@@ -125,6 +126,7 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
 
   get '/atom.xml' do
     build_frontpage
+    content_type 'application/atom+xml'
     mustache :atom, {:layout => false}
   end
 

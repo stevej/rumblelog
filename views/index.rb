@@ -4,14 +4,6 @@ class Rumblelog
       def pages
         @pages
       end
-
-      def title
-        @title
-      end
-
-      def subtitle
-        @subtitle
-      end
     end
   end
 end
