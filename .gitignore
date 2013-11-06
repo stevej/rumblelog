@@ -1,5 +1,6 @@
 *.log
 fauna
+.env
 .bundle
 .config
 *.gem
