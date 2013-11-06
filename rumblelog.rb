@@ -11,6 +11,9 @@ load 'lib/fauna_helper.rb'
 module Fauna
   mattr_accessor :connection
 
+  if !ENV.has_key?('RUMBLELOG_FAUNA_SECRET')
+    abort("RUMBLELOG_FAUNA_SECRET must be set")
+  end
   self.connection = Fauna::Connection.new(:secret => ENV['RUMBLELOG_FAUNA_SECRET'])
 end
 
@@ -50,6 +53,17 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
     end
   end
 
+  def validate(params)
+    data = params[:page]
+    data["tags"] = data["rawtags"].split(",").map { |t| t.strip }
+    data.delete("rawtags")
+
+    constraints = {}
+    constraints["permalink"] = data.delete("permalink")
+
+    return data, constraints
+  end
+
   set :public_folder, 'public'
 
   before do
@@ -76,17 +90,6 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
     mustache :create
   end
 
-  def validate(params)
-    data = params[:page]
-    data["tags"] = data["rawtags"].split(",").map { |t| t.strip }
-    data.delete("rawtags")
-
-    constraints = {}
-    constraints["permalink"] = data.delete("permalink")
-
-    return data, constraints
-  end
-
   post '/create' do
     protected!
     # TODO: validate post params
@@ -101,15 +104,33 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
 
   get '/edit' do
     protected!
-    data, constraints = validate(params)
-    Fauna.with_context do
-      # Fauna::Resource.update ???
+    if params.has_key?("page")
+      @page = Fauna.with_context do
+        Page.find_by_permalink(params["page"]).page(:size => 1).map { |p| Page.find(p) }
+      end
+      mustache :edit_single_page
+    else
+      build_frontpage
+      mustache :edit
     end
-    redirect "/edit"
   end
 
   post '/edit' do
     protected!
+
+    redirect '/edit' unless params.has_key?("permalink")
+
+    data, constraints = validate(params)
+
+    @page = Fauna.with_context do
+      Page.find_by_permalink(params["permalink"]).page(:size => 1).map { |p| Page.find(p) }
+     end[0]
+
+    Fauna.with_context do
+      @page.resource.data.merge!(data)
+      @page.resource.save
+    end
+    redirect "/edit"
   end
 
   get '/t/:tag' do |tag|
@@ -208,42 +229,4 @@ class Page
     html_hash[:links_for_tags] = self.links_for_tags
     html_hash
   end
-
-  def update_tags
-    tags = self.tags
-    unless tags.nil?
-      tags.split(",").each do |tag_name|
-        tag_name.strip!
-        tag =
-          begin
-            Tag.create!(unique_id: tag_name)
-          rescue
-            Tag.find_by_unique_id(tag_name)
-          end
-        tag.pages.add self
-      end
-    end
-  end
 end
-
-class Tag < Fauna::Resource
-  #reference :page
-end
-
-# Data Model
-#
-# A Site consists of Pages
-# Pages belong to tags
-# Tags are organized by time
-#
-#
-# Fauna.schema do
-#   with Tag do
-#     event_set :pages
-#   end
-
-#   with Page do
-#     event_set :tags
-#   end
-# end
-

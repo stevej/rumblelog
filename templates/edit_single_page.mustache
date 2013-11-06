@@ -1,0 +1,23 @@
+{{#page}}
+  <h1>Editing Post {{permalink}}</h1>
+  <form class="pure-form pure-form-aligned" name="create" action="/edit" method="POST">
+  <fieldset>
+    <input type="hidden" name="permalink" value="{{permalink}}">
+    <div class="pure-control-group">
+      <label for="title">Title</label>
+      <input placeholder="Your Title Here" id="title" name="page[title]" value="{{title}}" />
+    </div>
+    <div class="pure-control-group">
+      <label for="rawtags">Tags</label>
+      <input placeholder="tag1, tag2" id="rawtags" name="page[rawtags]" value="{{rawtags}}" />
+    </div>
+    <div class="pure-control-group">
+      <label for="body">Body</label>
+      <textarea id="body" placeholder="Your Post Here" name="page[body]">{{body}}</textarea>
+    </div>
+    <div class="pure-controls">
+      <button class="pure-button pure-button-primary" type="submit"/>publish</button>
+    </div>
+  </fieldset>
+  </form>
+{{/page}}
