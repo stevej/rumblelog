@@ -5,7 +5,7 @@ Clone either the original project or your fork of the project, the commands we r
 # Create a Fauna account: http://fauna.org/
 
 # Create a Database: https://fauna.org/account/databases, name it anything at all.
-# At the database page in fauna, create a new class named `Page` (capitalization is important)
+# At the database page in fauna, create a new class named `Pages` (capitalization is important)
 # Copy the Server Key, we'll need it later.
 
 # Signup for Heroku: http://heroku.com, follow along at: https://devcenter.heroku.com/articles/getting-started-with-ruby
