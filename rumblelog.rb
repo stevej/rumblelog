@@ -9,11 +9,18 @@ load 'lib/fauna_helper.rb'
 
 # TODO: this is not awesome but works for now.
 module Fauna
+  def self.validate_env(key)
+    if !ENV.has_key?(key)
+      abort("#{key} must be set")
+    end
+  end
+
   mattr_accessor :connection
 
-  if !ENV.has_key?('RUMBLELOG_FAUNA_SECRET')
-    abort("RUMBLELOG_FAUNA_SECRET must be set")
-  end
+  validate_env('RUMBLELOG_FAUNA_SECRET')
+  validate_env('RUMBLELOG_ADMIN_USERNAME')
+  validate_env('RUMBLELOG_ADMIN_PASSWORD')
+
   self.connection = Fauna::Connection.new(:secret => ENV['RUMBLELOG_FAUNA_SECRET'])
 end
 
