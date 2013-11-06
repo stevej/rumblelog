@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 
 gem 'sinatra'
+gem 'rack'
 gem 'fauna', ">= 1.2"
 gem 'mustache'
 gem 'shotgun'
