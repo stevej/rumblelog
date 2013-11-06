@@ -81,15 +81,10 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
   end
 
   def build_frontpage
-    @pages =
-      begin
-        Fauna.with_context do
-        @pages_set = Fauna::Set.new('classes/Pages/instances')
-        @pages_set.page(:size => 10).map { |p| Page.find(p) }
-      end
-      rescue Fauna::Connection::NotFound
-        []
-      end
+    Fauna.with_context do
+      @pages_set = Fauna::Set.new('classes/Pages/instances')
+      @pages = @pages_set.page(:size => 10).map { |p| Page.find(p) }
+    end
   end
 
   get '/' do
