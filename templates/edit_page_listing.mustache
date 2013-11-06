@@ -2,4 +2,12 @@
   <td><a href="/edit?page={{permalink}}">{{permalink}}</a></td>
   <td>{{title}}</td>
   <td>{{ts}}</td>
+  <td>
+    <form class="pure-form" action="/delete" method="POST">
+    <div class="pure-controls">
+      <input type="hidden" name="ref" value="{{ref}}">
+      <button class="pure-button pure-button-primary" type="DELETE"/>DELETE</button>
+    </div>
+    </form>
+  </td>
 </tr>

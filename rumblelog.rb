@@ -151,6 +151,15 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
     mustache :atom, {:layout => false}
   end
 
+  post '/delete' do
+    protected!
+    redirect '/edit' unless params.has_key?("ref")
+    Fauna.with_context do
+      Fauna::Resource.find(params["ref"]).delete
+     end
+    redirect '/edit'
+  end
+
   get '/:permalink' do |permalink|
     # matches "GET /hello/foo" and "GET /hello/bar"
     begin
