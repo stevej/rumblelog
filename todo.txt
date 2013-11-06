@@ -1,2 +1,0 @@
-* Run on Heroku
-* Write HOWTO for running your own version
