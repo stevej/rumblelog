@@ -5,5 +5,4 @@ fauna
 *.gem
 tmp
 vendor
-Gemfile.lock
 .vagrant/
