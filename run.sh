@@ -15,4 +15,4 @@ if [ -z "$RUMBLELOG_FAUNA_SECRET" ]; then
     exit 1
 fi
 
-bundle exec shotgun -p 1234 -o 0.0.0.0
+bundle exec shotgun -p 5000 -o 0.0.0.0
