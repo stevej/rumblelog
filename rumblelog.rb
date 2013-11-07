@@ -109,14 +109,18 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
 
   get '/edit' do
     protected!
-    if params.has_key?("page")
-      @pages = Fauna.with_context do
-        [Page.find_by_permalink(params["page"])]
+    begin
+      if params.has_key?("page")
+        @pages = Fauna.with_context do
+          [Page.find_by_permalink(params["page"])]
+        end
+        mustache :edit_single_page
+      else
+        build_frontpage
+        mustache :edit
       end
-      mustache :edit_single_page
-    else
-      build_frontpage
-      mustache :edit
+    rescue Fauna::Connection::NotFound
+      redirect '/edit'
     end
   end
 
@@ -127,15 +131,20 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
 
     data, constraints = validate(params)
 
-    @page = Fauna.with_context do
-      Page.find_by_permalink(params["permalink"])
-     end
+    begin
+      @page = Fauna.with_context do
+        Page.find_by_permalink(params["permalink"])
+      end
 
-    Fauna.with_context do
-      @page.resource.data.merge!(data)
-      @page.resource.save
+      Fauna.with_context do
+        @page.resource.data.merge!(data)
+        @page.resource.save
+      end
+      redirect "/edit"
+    rescue Fauna::Connection::NotFound
+      status 404
+      body '404 - page to edit not found'
     end
-    redirect "/edit"
   end
 
   get '/t/:tag' do |tag|
