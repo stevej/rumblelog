@@ -190,7 +190,7 @@ class Page
   def self.find_by_permalink(permalink)
     @pages = Fauna::Set.match('classes/Pages', 'constraints.permalink', permalink).page(:size => 1)
     if @pages.empty?
-      raise Fauna::Connection::NotFound,("no pages match #{permalink}")
+      raise Fauna::Connection::NotFound, "no pages match #{permalink}"
     else
       @pages.map { |ref| Page.find(ref) }[0]
     end
