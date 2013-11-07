@@ -4,10 +4,8 @@ require 'fauna'
 # for mattr_accessor
 require 'active_support/core_ext/module/attribute_accessors'
 
-# TODO: make this nicer
 load 'lib/fauna_helper.rb'
 
-# TODO: this is not awesome but works for now.
 module Fauna
   def self.validate_env(key)
     if !ENV.has_key?(key)
@@ -112,8 +110,8 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
   get '/edit' do
     protected!
     if params.has_key?("page")
-      @page = Fauna.with_context do
-        Page.find_by_permalink(params["page"]).page(:size => 1).map { |p| Page.find(p) }
+      @pages = Fauna.with_context do
+        [Page.find_by_permalink(params["page"])]
       end
       mustache :edit_single_page
     else
@@ -130,8 +128,8 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
     data, constraints = validate(params)
 
     @page = Fauna.with_context do
-      Page.find_by_permalink(params["permalink"]).page(:size => 1).map { |p| Page.find(p) }
-     end[0]
+      Page.find_by_permalink(params["permalink"])
+     end
 
     Fauna.with_context do
       @page.resource.data.merge!(data)
@@ -171,7 +169,7 @@ A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://s
     # matches "GET /hello/foo" and "GET /hello/bar"
     begin
       @pages = Fauna.with_context do
-        Page.find_by_permalink(permalink).page(:size => 1).map { |p| Page.find(p) }
+        [Page.find_by_permalink(permalink)]
       end
 
       mustache :render_page
@@ -190,7 +188,12 @@ class Page
   end
 
   def self.find_by_permalink(permalink)
-    Fauna::Set.match('classes/Pages', 'constraints.permalink', permalink)
+    @pages = Fauna::Set.match('classes/Pages', 'constraints.permalink', permalink).page(:size => 1)
+    if @pages.empty?
+      raise Fauna::Connection::NotFound,("no pages match #{permalink}")
+    else
+      @pages.map { |ref| Page.find(ref) }[0]
+    end
   end
 
   def self.find_by_tag(tag)
