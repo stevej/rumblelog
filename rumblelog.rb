@@ -32,7 +32,7 @@ class Rumblelog < Sinatra::Base
   }
 
   configure do
-    set :title, "Rumbleblog"
+    set :title, "Rumblelog"
     set :subtitle, <<-eos
 A sample blog powered by <a href="http://fauna.org">Fauna</a>, <a href="http://sinatrarb.com">Sinatra</a>, <a href="http://purecss.io">Pure</a>, and <a href="http://heroku.com">Heroku</a>
     eos
