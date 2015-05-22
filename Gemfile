@@ -8,5 +8,5 @@ gem 'shotgun'
 gem 'rake'
 gem 'tux'
 gem 'unicorn'
-gem 'active_support'
+gem 'activesupport'
 
