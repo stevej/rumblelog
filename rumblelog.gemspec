@@ -17,5 +17,5 @@ Gem::Specification.new do |s|
   s.add_dependency "sinatra"
   s.add_dependency "fauna"
   s.add_dependency "mustache"
-  s.add_dependency "active_support"
+  s.add_dependency "activesupport"
 end
